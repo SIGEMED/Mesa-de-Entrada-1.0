@@ -5,7 +5,7 @@ import {
 } from './types';
 import { INITIAL_DOCUMENTS, getNextDocNumber, getNextPaseId, getNextHistId } from './data';
 
-type Screen = 'dashboard' | 'ingreso' | 'bandeja' | 'caratula' | 'pases-entrantes' | 'emitir-pase' | 'busqueda' | 'historial' | 'admin-panel' | 'evaluar' | 'detalle' | 'recibir-pase' | 'emitir-pase-doc';
+type Screen = 'dashboard' | 'ingreso' | 'bandeja' | 'caratula' | 'pases-entrantes' | 'emitir-pase' | 'busqueda' | 'historial' | 'evaluar' | 'detalle' | 'recibir-pase' | 'emitir-pase-doc';
 
 function getNow(): { fecha: string; hora: string } {
   const d = new Date();
@@ -66,7 +66,7 @@ export default function App() {
       case 'evaluador':
         filtered = filtered.filter(d => d.estado === 'EN DESPACHO' || d.historial.some(h => h.rol === 'Evaluador'));
         break;
-      case 'operador':
+      case 'caratulador':
         filtered = filtered.filter(d => d.tipoDocumental === 'Expediente' || d.historial.some(h => h.area === 'Despacho'));
         break;
       case 'secretaria':
@@ -173,7 +173,7 @@ export default function App() {
           {currentScreen === 'busqueda' && <Busqueda documents={filteredDocuments} role={currentRole} setSelectedDocId={setSelectedDocId} setCurrentScreen={setCurrentScreen} searchFilters={searchFilters} setSearchFilters={setSearchFilters} />}
           {currentScreen === 'historial' && <HistorialScreen documents={documents} role={currentRole} setSelectedDocId={setSelectedDocId} setCurrentScreen={setCurrentScreen} />}
           {currentScreen === 'detalle' && selectedDoc && <DetalleDocumento doc={selectedDoc} setCurrentScreen={setCurrentScreen} role={currentRole} />}
-          {currentScreen === 'admin-panel' && <AdminPanel />}
+        
         </main>
       </div>
     </div>
@@ -242,7 +242,7 @@ function Dashboard({ role, documents, currentUser, navigateTo }: { role: Role; d
     );
   }
 
-  if (role === 'operador') {
+  if (role === 'caratulador') {
     return (
       <div>
         <h3 className="text-xl font-bold text-gray-800 mb-6">Operador de Caratulación - Resumen</h3>
@@ -286,23 +286,6 @@ function Dashboard({ role, documents, currentUser, navigateTo }: { role: Role; d
             <i className="fas fa-paper-plane mr-2"></i>Emitir pase
           </button>
         </div>
-      </div>
-    );
-  }
-
-  if (role === 'admin') {
-    return (
-      <div>
-        <h3 className="text-xl font-bold text-gray-800 mb-6">Panel Técnico de Administración</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard title="Usuarios activos" value={USUARIOS.length} icon="fa-users" color="blue" />
-          <MetricCard title="Roles configurados" value={Object.keys(ROLES_LABELS).length} icon="fa-user-shield" color="green" />
-          <MetricCard title="Áreas registradas" value={AREAS.length} icon="fa-building" color="purple" />
-          <MetricCard title="Documentos en sistema" value={documents.length} icon="fa-file-lines" color="gray" />
-        </div>
-        <button onClick={() => navigateTo('admin-panel')} className="mt-6 bg-gray-700 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition font-medium">
-          <i className="fas fa-gears mr-2"></i>Ir al Panel Técnico
-        </button>
       </div>
     );
   }
@@ -418,10 +401,8 @@ function IngresoForm({ documents, setDocuments, currentUser, showNotification, a
         <div className="mb-6">
           <label className="block text-sm font-semibold text-gray-700 mb-2">Tipo documental *</label>
           <select value={tipo} onChange={e => setTipo(e.target.value as TipoDocumental)} className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500">
-            <option value="Expediente">Expediente</option>
             <option value="Nota">Nota</option>
-            <option value="Informe">Informe</option>
-            <option value="Otro documento">Otro documento</option>
+            <option value="Expediente">Expediente</option>
           </select>
         </div>
 
@@ -475,17 +456,6 @@ function IngresoForm({ documents, setDocuments, currentUser, showNotification, a
             <input type="text" value={form.asunto} onChange={e => updateField('asunto', e.target.value)} className={`w-full border rounded-lg px-4 py-2.5 text-sm ${errors.asunto ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-blue-500`} placeholder="Descripción breve del asunto" />
             {errors.asunto && <p className="text-xs text-red-600 mt-1">{errors.asunto}</p>}
           </div>
-
-          {/* Área emisora (solo Informe) */}
-          {tipo === 'Informe' && (
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Área emisora</label>
-              <select value={form.areaEmisora} onChange={e => updateField('areaEmisora', e.target.value)} className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500">
-                <option value="">Seleccionar área...</option>
-                {AREAS.filter(a => a.id !== 'mesa').map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
-              </select>
-            </div>
-          )}
 
           {/* Área destino sugerida (solo Nota) */}
           {tipo === 'Nota' && (
@@ -1326,9 +1296,7 @@ function Busqueda({ documents, role, setSelectedDocId, setCurrentScreen, searchF
             <option value="Todos">Todos los tipos</option>
             <option value="Expediente">Expediente</option>
             <option value="Nota">Nota</option>
-            <option value="Informe">Informe</option>
-            <option value="Otro documento">Otro documento</option>
-          </select>
+            </select>
           <select value={searchFilters.area} onChange={e => setSearchFilters({ ...searchFilters, area: e.target.value })} className="border border-gray-300 rounded-lg px-3 py-2 text-sm">
             <option value="Todos">Todas las áreas</option>
             {AREAS.map(a => <option key={a.id} value={a.nombre}>{a.nombre}</option>)}
@@ -1536,71 +1504,6 @@ function DetalleDocumento({ doc, setCurrentScreen, role }: { doc: Documento; set
   );
 }
 
-// ============ ADMIN PANEL ============
-function AdminPanel() {
-  return (
-    <div>
-      <h3 className="text-lg font-bold text-gray-800 mb-6">Panel Técnico de Administración</h3>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Usuarios */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-md font-bold text-gray-700 mb-4"><i className="fas fa-users mr-2 text-blue-600"></i>Usuarios y Roles</h4>
-          <table className="w-full text-sm">
-            <thead><tr className="border-b"><th className="text-left py-2">Nombre</th><th className="text-left py-2">Rol</th><th className="text-left py-2">Área</th></tr></thead>
-            <tbody>
-              {USUARIOS.map(u => (
-                <tr key={u.id} className="border-b border-gray-100">
-                  <td className="py-2">{u.nombre}</td>
-                  <td className="py-2"><span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">{ROLES_LABELS[u.rol]}</span></td>
-                  <td className="py-2">{u.area}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Áreas */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-md font-bold text-gray-700 mb-4"><i className="fas fa-building mr-2 text-green-600"></i>Áreas Registradas</h4>
-          <div className="space-y-2">
-            {AREAS.map(a => (
-              <div key={a.id} className="flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2 border border-gray-200">
-                <i className="fas fa-building text-gray-400"></i>
-                <span className="text-sm">{a.nombre}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Tipos Documentales */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-md font-bold text-gray-700 mb-4"><i className="fas fa-file-alt mr-2 text-purple-600"></i>Tipos Documentales</h4>
-          <div className="space-y-2">
-            {['Expediente', 'Nota', 'Informe', 'Otro documento'].map(t => (
-              <div key={t} className="flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-2 border border-gray-200">
-                <i className="fas fa-file text-gray-400"></i>
-                <span className="text-sm">{t}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Notas */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-md font-bold text-gray-700 mb-4"><i className="fas fa-info-circle mr-2 text-yellow-600"></i>Notas del Sistema</h4>
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li className="flex items-start gap-2"><i className="fas fa-check text-green-500 mt-1"></i>El historial de trazabilidad es inmutable. No se permite editar ni eliminar actuaciones.</li>
-            <li className="flex items-start gap-2"><i className="fas fa-check text-green-500 mt-1"></i>Las agentes de traslado (María José y Graciela) no tienen usuario en el sistema.</li>
-            <li className="flex items-start gap-2"><i className="fas fa-check text-green-500 mt-1"></i>El Supervisor solo tiene acceso de lectura.</li>
-            <li className="flex items-start gap-2"><i className="fas fa-check text-green-500 mt-1"></i>No se incluyen funciones de Inteligencia Artificial.</li>
-            <li className="flex items-start gap-2"><i className="fas fa-check text-green-500 mt-1"></i>Los números internos son correlativos y únicos (formato XXXX/AAAA).</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ============ COMPONENTES AUXILIARES ============
 function StatusBadge({ status }: { status: string }) {
   const colors: Record<string, string> = {
@@ -1625,3 +1528,4 @@ function PaseBadge({ status }: { status: string }) {
   };
   return <span className={`px-2 py-1 rounded text-xs font-medium ${colors[status] || 'bg-gray-100 text-gray-800'}`}>{status}</span>;
 }
+
