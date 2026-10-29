@@ -1,6 +1,6 @@
-export type Role = 'recepcion' | 'evaluador' | 'operador' | 'secretaria' | 'supervisor' | 'admin';
+export type Role = 'recepcion' | 'evaluador' | 'caratulador' | 'secretaria' | 'supervisor' ;
 
-export type TipoDocumental = 'Expediente' | 'Nota' | 'Informe' | 'Otro documento';
+export type TipoDocumental = 'Nota' | 'Expediente' ;
 
 export type EstadoDocumento = 
   | 'EN DESPACHO' 
@@ -97,23 +97,21 @@ export interface Area {
 
 export const AREAS: Area[] = [
   { id: 'mesa', nombre: 'Mesa de Entrada' },
-  { id: 'despacho', nombre: 'Despacho' },
+  { id: 'despacho', nombre: 'Coordinación de Despacho' },
   { id: 'secretaria-calidad', nombre: 'Secretaría de Calidad Ambiental' },
-  { id: 'dir-gral-ambiente', nombre: 'Dirección General de Ambiente' },
-  { id: 'dir-recursos-naturales', nombre: 'Dirección de Recursos Naturales' },
-  { id: 'dir-gestion-residuos', nombre: 'Dirección de Gestión de Residuos' },
-  { id: 'dir-cambio-climatico', nombre: 'Dirección de Cambio Climático' },
-  { id: 'legal', nombre: 'Área Legal' },
-  { id: 'personal', nombre: 'Dirección de Personal' },
+  { id: 'secretaria-bio', nombre: 'Secretaria de Biodiversidad y Desarrollo sustentable' },
+  { id: 'secretaria-ordenamiento', nombre: 'Secretaria de Ordenamiento ambiental territorial' },
+  { id: 'direc-juridicos', nombre: 'Dirección de Asuntos Juridicos' },
+  { id: 'coo-modernizacion', nombre: 'Coordinación de Modernización' },
 ];
 
 export const USUARIOS: Usuario[] = [
   { id: 'u1', nombre: 'Joaquín López', rol: 'recepcion', area: 'Mesa de Entrada' },
   { id: 'u2', nombre: 'Dr. Mamaní', rol: 'evaluador', area: 'Despacho' },
-  { id: 'u3', nombre: 'Carla Fernández', rol: 'operador', area: 'Despacho' },
+  { id: 'u3', nombre: 'Laura Lopez', rol: 'caratulador', area: 'Despacho' },
   { id: 'u4', nombre: 'Lucía Romero', rol: 'secretaria', area: 'Secretaría de Calidad Ambiental' },
-  { id: 'u5', nombre: 'Min. Alejandro Torres', rol: 'supervisor', area: 'Ministerio' },
-  { id: 'u6', nombre: 'Soporte Técnico', rol: 'admin', area: 'Sistemas' },
+  { id: 'u5', nombre: 'Min. Alejandro Alvares', rol: 'supervisor', area: 'Ministerio' },
+
 ];
 
 export const ROLES_LABELS: Record<string, string> = {
@@ -122,7 +120,6 @@ export const ROLES_LABELS: Record<string, string> = {
   operador: 'Operador de Caratulación',
   secretaria: 'Administrativo de Secretaría',
   supervisor: 'Supervisor / Autoridad',
-  admin: 'Administrador',
 };
 
 export interface MenuOption {
@@ -133,13 +130,12 @@ export interface MenuOption {
 }
 
 export const MENU_OPTIONS: MenuOption[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', roles: ['recepcion', 'evaluador', 'operador', 'secretaria', 'supervisor', 'admin'] },
-  { id: 'ingreso', label: 'Ingreso', icon: 'fa-file-circle-plus', roles: ['recepcion', 'operador'] },
+  { id: 'ingreso', label: 'Ingreso', icon: 'fa-file-circle-plus', roles: ['recepcion', 'caratulador'] },
   { id: 'bandeja', label: 'Bandeja de Evaluación', icon: 'fa-clipboard-check', roles: ['evaluador'] },
-  { id: 'caratula', label: 'Carátula / Vinculación', icon: 'fa-stamp', roles: ['operador'] },
+  { id: 'caratula', label: 'Carátula / Vinculación', icon: 'fa-stamp', roles: ['caratulador'] },
   { id: 'pases-entrantes', label: 'Pases Entrantes', icon: 'fa-inbox', roles: ['secretaria'] },
-  { id: 'emitir-pase', label: 'Emitir Pase', icon: 'fa-paper-plane', roles: ['operador', 'secretaria'] },
-  { id: 'busqueda', label: 'Búsqueda', icon: 'fa-magnifying-glass', roles: ['recepcion', 'evaluador', 'operador', 'secretaria', 'supervisor'] },
-  { id: 'historial', label: 'Historial', icon: 'fa-clock-rotate-left', roles: ['recepcion', 'evaluador', 'operador', 'secretaria', 'supervisor'] },
-  { id: 'admin-panel', label: 'Panel Técnico', icon: 'fa-gears', roles: ['admin'] },
+  { id: 'emitir-pase', label: 'Emitir Pase', icon: 'fa-paper-plane', roles: ['caratulador', 'secretaria'] },
+  { id: 'busqueda', label: 'Búsqueda', icon: 'fa-magnifying-glass', roles: ['recepcion', 'evaluador', 'secretaria', 'supervisor'] },
+  { id: 'historial', label: 'Historial', icon: 'fa-clock-rotate-left', roles: ['evaluador', 'caratulador', 'secretaria', 'supervisor'] },
+  { id: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', roles: [ 'supervisor'] },
 ];

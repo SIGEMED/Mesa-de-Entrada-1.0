@@ -179,7 +179,7 @@ export const INITIAL_DOCUMENTS: Documento[] = [
   {
     id: 'doc-5',
     numeroInterno: 'I-0012/2026',
-    tipoDocumental: 'Informe',
+    tipoDocumental: 'Nota',
     remitente: 'Dirección de Gestión de Residuos',
     tipoRemitente: 'Organismo',
     nombreRazonSocial: 'Dirección de Gestión de Residuos',
